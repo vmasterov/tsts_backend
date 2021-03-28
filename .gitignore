@@ -1,0 +1,11 @@
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log
+
+.idea/
+.tmp/
+.vscode/
+yarn-error.log
+.env
