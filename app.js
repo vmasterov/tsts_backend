@@ -1,9 +1,23 @@
 const express = require('express')
 const path = require('path')
 const logger = require('morgan')
+const mongoose = require('mongoose')
+const config = require('./config')
 
 const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
+
+const url = config.mongoUrl
+const connect = mongoose.connect(url, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false
+})
+
+connect.then(
+  () => console.log('Connected correctly to server'),
+  error => console.log(error)
+)
 
 const app = express()
 
