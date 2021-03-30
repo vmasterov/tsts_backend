@@ -11,10 +11,6 @@ const User = new Schema({
     type: String,
     default: ''
   },
-  name: {
-    type: String,
-    default: ''
-  },
   email: {
     type: String,
     default: ''
