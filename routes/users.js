@@ -2,9 +2,9 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const User = require('../models/user')
 const router = express.Router()
-const passport = require('passport')
-const authenticate = require('../authenticate')
-const cors = require('./cors')
+// const passport = require('passport')
+// const authenticate = require('../authenticate')
+// const cors = require('./cors')
 
 router.use(bodyParser.json())
 
@@ -21,7 +21,7 @@ router.get('/', (req, res, next) => {
     )
     .catch(error => next(error))
 })
-
+/*
 router.post('/singup', cors.corsWithOptions, function (req, res) {
   User.register(new User({username: req.body.username}), req.body.password, (error, user) => {
     if (error) {
@@ -73,5 +73,5 @@ router.get('/logout', cors.corsWithOptions, function (req, res, next) {
     next(error)
   }
 })
-
+*/
 module.exports = router
