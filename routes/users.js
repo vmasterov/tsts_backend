@@ -3,12 +3,12 @@ const bodyParser = require('body-parser')
 const User = require('../models/user')
 const router = express.Router()
 const passport = require('passport')
-// const authenticate = require('../authenticate')
+const authenticate = require('../authenticate')
 // const cors = require('./cors')
 
 router.use(bodyParser.json())
 
-router.get('/', (req, res, next) => {
+router.get('/', /* cors.corsWithOptions, */ authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
   User.find({})
     .then(
       users => {
@@ -51,28 +51,29 @@ router.post('/singup', /* cors.corsWithOptions, */ function (req, res) {
   })
 })
 
-// router.post('/singin', cors.corsWithOptions, passport.authenticate('local'), function (req, res) {
-//   let token = authenticate.getToken({ _id: req.user._id })
-//   res.statusCode = 200
-//   res.setHeader('Content-Type', 'application/json')
-//   res.json({
-//     token,
-//     success: true,
-//     status: 'You are successfully logged in!'
-//   })
-// })
-//
-// router.get('/logout', cors.corsWithOptions, function (req, res, next) {
-//   if (req.session) {
-//     req.session.destroy()
-//     res.clearCookie('session-id')
-//     res.redirect('/')
-//   }
-//   else {
-//     let error = new Error('You are not logged in!')
-//     error.status = 403
-//     next(error)
-//   }
-// })
+router.post('/singin', /* cors.corsWithOptions, */ passport.authenticate('local'), function (req, res) {
+  let token = authenticate.getToken({ _id: req.user._id })
+  res.statusCode = 200
+  res.setHeader('Content-Type', 'application/json')
+  res.json({
+    token,
+    success: true,
+    status: 'You are successfully logged in!'
+  })
+})
+
+router.get('/logout', /* cors.corsWithOptions, */ function (req, res, next) {
+  // Check if DON`T Facebook use sessions -- remove it
+  if (req.session) {
+    req.session.destroy()
+    res.clearCookie('session-id')
+    res.redirect('/')
+  }
+  else {
+    let error = new Error('You are not logged in!')
+    error.status = 403
+    next(error)
+  }
+})
 
 module.exports = router
