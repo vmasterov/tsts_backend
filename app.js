@@ -8,6 +8,7 @@ const createError = require('http-errors')
 
 const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
+const uploadRouter = require('./routes/upload')
 
 const url = config.mongoUrl
 const connect = mongoose.connect(url, {
@@ -36,6 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', indexRouter)
 app.use('/users', usersRouter)
+app.use('/upload-test', uploadRouter)
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

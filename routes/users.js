@@ -62,6 +62,19 @@ router.post('/singin', cors.corsWithOptions, passport.authenticate('local'), fun
   })
 })
 
+router.get('/facebook/token', passport.authenticate('facebook-token'), (req, res) => {
+  if (req.user) {
+    const token = authenticate.getToken({ _id: req.user._id })
+    res.statusCode = 200
+    res.setHeader('Content-Type', 'application/json')
+    res.json({
+      token,
+      success: true,
+      status: 'You are successfully logged in!'
+    })
+  }
+})
+
 router.get('/logout', cors.corsWithOptions, function (req, res, next) {
   // Check if DON`T Facebook use sessions -- remove it
   if (req.session) {
