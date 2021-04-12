@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const User = require('../models/user')
+const Test = require('../models/test')
 const router = express.Router()
 const passport = require('passport')
 const authenticate = require('../authenticate')
@@ -8,8 +9,10 @@ const cors = require('./cors')
 
 router.use(bodyParser.json())
 
-router.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+// router.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+router.get('/', cors.corsWithOptions, (req, res, next) => {
   User.find({})
+    .populate({ path: 'tests', model: Test })
     .then(
       users => {
         res.statusCode = 200

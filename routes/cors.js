@@ -1,6 +1,6 @@
 const cors = require('cors')
 
-const whiteList = ['http://localhost:3000', 'https://localhost:3443']
+const whiteList = ['http://localhost:3001', 'https://localhost:3444']
 
 const corsOptionsDelegate = (req, callback) => {
   let corsOptions
