@@ -54,16 +54,18 @@ router.post('/singup', cors.corsWithOptions, function (req, res) {
   })
 })
 
-router.post('/singin', cors.corsWithOptions, passport.authenticate('local'), function (req, res) {
-  let token = authenticate.getToken({ _id: req.user._id })
-  res.statusCode = 200
-  res.setHeader('Content-Type', 'application/json')
-  res.json({
-    token,
-    success: true,
-    status: 'You are successfully logged in!'
+router.route('/singin')
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .post(cors.corsWithOptions, passport.authenticate('local'), function (req, res) {
+    let token = authenticate.getToken({ _id: req.user._id })
+    res.statusCode = 200
+    res.setHeader('Content-Type', 'application/json')
+    res.json({
+      token,
+      success: true,
+      status: 'You are successfully logged in!'
+    })
   })
-})
 
 router.get('/facebook/token', passport.authenticate('facebook-token'), (req, res) => {
   if (req.user) {
