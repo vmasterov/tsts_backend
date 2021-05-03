@@ -9,20 +9,37 @@ const cors = require('./cors')
 
 router.use(bodyParser.json())
 
-// router.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
-router.get('/', cors.corsWithOptions, (req, res, next) => {
-  User.find({})
-    .populate({ path: 'tests', model: Test })
-    .then(
-      users => {
-        res.statusCode = 200
-        res.setHeader('Content-Type', 'application/json')
-        res.json(users)
-      },
-      error => next(error)
-    )
-    .catch(error => next(error))
-})
+router.route('/')
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+    User.find({})
+      .populate({ path: 'tests', model: Test })
+      .then(
+        users => {
+          res.statusCode = 200
+          res.setHeader('Content-Type', 'application/json')
+          res.json(users)
+        },
+        error => next(error)
+      )
+      .catch(error => next(error))
+  })
+
+router.route('/user')
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+    User.findOne({ _id: req.user._id })
+      .populate({ path: 'tests', model: Test })
+      .then(
+        users => {
+          res.statusCode = 200
+          res.setHeader('Content-Type', 'application/json')
+          res.json(users)
+        },
+        error => next(error)
+      )
+      .catch(error => next(error))
+  })
 
 router.post('/singup', cors.corsWithOptions, function (req, res) {
   User.register(new User({ username: req.body.username }), req.body.password, (error, user) => {
@@ -56,16 +73,7 @@ router.post('/singup', cors.corsWithOptions, function (req, res) {
 
 router.route('/singin')
   .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-  .post(cors.corsWithOptions, passport.authenticate('local'), function (req, res) {
-    let token = authenticate.getToken({ _id: req.user._id })
-    res.statusCode = 200
-    res.setHeader('Content-Type', 'application/json')
-    res.json({
-      token,
-      success: true,
-      status: 'You are successfully logged in!'
-    })
-  })
+  .post(cors.corsWithOptions, authenticate.singin)
 
 router.get('/facebook/token', passport.authenticate('facebook-token'), (req, res) => {
   if (req.user) {

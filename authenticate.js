@@ -11,14 +11,40 @@ exports.local = passport.use(new LocalStrategy(User.authenticate()))
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
 
+exports.singin = (req, res, next) => {
+  passport.authenticate('local', function (err, user, info) {
+    if (err) {
+      return next(err)
+    }
+    if (!user) {
+      res.statusCode = 401
+      res.setHeader('Content-Type', 'application/json')
+      res.json({
+        err,
+        info,
+        success: false,
+        message: 'Неверный логин или пароль'
+      })
+    }
+    let token = jwt.sign({ _id: user._id }, config.secretKey, { expiresIn: 3600 })
+    res.statusCode = 200
+    res.setHeader('Content-Type', 'application/json')
+    res.json({
+      token,
+      success: true,
+      message: 'Вы успешно зарегистрированы в системе'
+    })
+  })(req, res, next)
+}
+
 exports.getToken = user => jwt.sign(user, config.secretKey, { expiresIn: 3600 })
 
-const opts = {
+const options = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: config.secretKey
 }
 
-exports.jwtPassport = passport.use(new JwtStrategy(opts, (jwtPayload, done) => {
+exports.jwtPassport = passport.use(new JwtStrategy(options, (jwtPayload, done) => {
   User.findOne({ _id: jwtPayload._id }, (error, user) => {
     if (error) return done(error, false)
     else if (user) return done(null, user)
@@ -26,7 +52,26 @@ exports.jwtPassport = passport.use(new JwtStrategy(opts, (jwtPayload, done) => {
   })
 }))
 
-exports.verifyUser = passport.authenticate('jwt', { session: false })
+exports.verifyUser = (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, function (err, user, info) {
+    if (err) {
+      return next(err)
+    }
+    if (!user) {
+      res.statusCode = 401
+      res.setHeader('Content-Type', 'application/json')
+      res.json({
+        err,
+        info,
+        success: false,
+        message: 'Неверный логин или пароль1'
+      })
+      return
+    }
+    req.user = user
+    next()
+  })(req, res, next)
+}
 
 exports.verifyAdmin = (req, res, next) => {
   User.findOne({ _id: req.user._id })
