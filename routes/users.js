@@ -41,35 +41,67 @@ router.route('/user')
       .catch(error => next(error))
   })
 
-router.post('/singup', cors.corsWithOptions, function (req, res) {
-  User.register(new User({ username: req.body.username }), req.body.password, (error, user) => {
-    if (error) {
-      res.statusCode = 500
-      res.setHeader('Content-Type', 'application/json')
-      res.json({ error: String(error) })
-    }
-    else {
-      if (req.body.email) user.email = req.body.email
-      if (req.body.avatar) user.avatar = req.body.avatar
-      if (req.body.tests) user.tests = req.body.tests
-      if (req.body.statistics) user.statistics = req.body.statistics
+router.route('/singup')
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .post(cors.corsWithOptions, function (req, res) {
+    User.register(new User({ username: req.body.username }), req.body.password, (error, user) => {
+      if (error) {
+        res.statusCode = 500
+        res.setHeader('Content-Type', 'application/json')
+        res.json({ error: String(error) })
+      }
+      else {
+        if (req.body.email) user.email = req.body.email
+        if (req.body.avatar) user.avatar = req.body.avatar
+        if (req.body.tests) user.tests = req.body.tests
+        if (req.body.statistics) user.statistics = req.body.statistics
 
-      user.save(error => {
-        if (error) {
-          res.statusCode = 500
-          res.setHeader('Content-Type', 'application/json')
-          res.json({ error: String(error) })
-          return
-        }
-        passport.authenticate('local')(req, res, () => {
-          res.statusCode = 200
-          res.setHeader('Content-Type', 'application/json')
-          res.json({ success: true, status: 'Registration Successful!' })
+        user.save(error => {
+          if (error) {
+            res.statusCode = 500
+            res.setHeader('Content-Type', 'application/json')
+            res.json({ error: String(error) })
+            return
+          }
+          passport.authenticate('local')(req, res, () => {
+            res.statusCode = 200
+            res.setHeader('Content-Type', 'application/json')
+            res.json({ success: true, status: 'Registration Successful!' })
+          })
         })
-      })
-    }
+      }
+    })
   })
-})
+
+// router.post('/singup', cors.corsWithOptions, function (req, res) {
+//   User.register(new User({ username: req.body.username }), req.body.password, (error, user) => {
+//     if (error) {
+//       res.statusCode = 500
+//       res.setHeader('Content-Type', 'application/json')
+//       res.json({ error: String(error) })
+//     }
+//     else {
+//       if (req.body.email) user.email = req.body.email
+//       if (req.body.avatar) user.avatar = req.body.avatar
+//       if (req.body.tests) user.tests = req.body.tests
+//       if (req.body.statistics) user.statistics = req.body.statistics
+//
+//       user.save(error => {
+//         if (error) {
+//           res.statusCode = 500
+//           res.setHeader('Content-Type', 'application/json')
+//           res.json({ error: String(error) })
+//           return
+//         }
+//         passport.authenticate('local')(req, res, () => {
+//           res.statusCode = 200
+//           res.setHeader('Content-Type', 'application/json')
+//           res.json({ success: true, status: 'Registration Successful!' })
+//         })
+//       })
+//     }
+//   })
+// })
 
 router.route('/singin')
   .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
