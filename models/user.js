@@ -7,7 +7,7 @@ const User = new Schema({
     type: Boolean,
     default: false
   },
-  facebookId: {
+  facebook_id: {
     type: String,
     default: ''
   },
@@ -21,14 +21,14 @@ const User = new Schema({
   },
   tests: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Tests'
+    ref: 'tests'
   }],
   statistics: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Statistics'
+    ref: 'statistics'
   }
 })
 
 User.plugin(passportLocalMongoose)
 
-module.exports = mongoose.model('User', User, 'Users')
+module.exports = mongoose.model('User', User)

@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 const Test = new Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Users'
+    ref: 'users'
   },
   name: {
     type: String,
@@ -24,4 +24,4 @@ const Test = new Schema({
   }
 })
 
-module.exports = mongoose.model('Test', Test, 'Tests')
+module.exports = mongoose.model('Test', Test)

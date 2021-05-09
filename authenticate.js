@@ -26,13 +26,14 @@ exports.singin = (req, res, next) => {
         message: 'Неверный логин или пароль'
       })
     }
-    let token = jwt.sign({ _id: user._id }, config.secretKey, { expiresIn: 3600 })
+    const token = jwt.sign({ _id: user._id }, config.secretKey, { expiresIn: 3600 })
+    const message = req.singup ? 'Пользователь создан и вы успешно зарегистрированы в системе' : 'Вы успешно зарегистрированы в системе'
     res.statusCode = 200
     res.setHeader('Content-Type', 'application/json')
     res.json({
       token,
       success: true,
-      message: 'Вы успешно зарегистрированы в системе'
+      message: message
     })
   })(req, res, next)
 }
