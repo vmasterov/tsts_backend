@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const User = require('../models/user')
 const Test = require('../models/test')
+const Answer = require('../models/answer')
 const router = express.Router()
 const passport = require('passport')
 const authenticate = require('../authenticate')
@@ -60,10 +61,26 @@ router.route('/user/tests/:id')
     Test.find({ _id: req.params.id })
       .then(
         test => {
-          console.log('test', test)
           res.statusCode = 200
           res.setHeader('Content-Type', 'application/json')
           res.json(test)
+        },
+        error => next(error)
+      )
+      .catch(error => next(error))
+  })
+
+router.route('/user/tests/:id/result')
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+    Answer.find({ test_id: req.params.id })
+      .then(
+        answer => {
+          console.log('answer', req.body)
+          res.statusCode = 200
+          res.setHeader('Content-Type', 'application/json')
+          // res.setHeader('Content-Type', 'text/plain')
+          res.json(answer)
         },
         error => next(error)
       )
