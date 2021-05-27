@@ -73,14 +73,26 @@ router.route('/user/tests/:id')
 router.route('/user/tests/:id/result')
   .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
   .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    Answer.find({ test_id: req.params.id })
+    Answer.findOne({ test_id: req.params.id })
       .then(
         answer => {
-          console.log('answer', req.body)
+          let sum = 0
+
+          for (let i = 0, l = req.body.length; i < l; i++) {
+            const current = req.body[i]
+            const rightAnswer = answer.answers[current.id]
+            const userAnswer = current.answer
+            let rightAnswerStr = rightAnswer.sort().join('')
+            let userAnswerStr = Array.isArray(userAnswer) ? userAnswer.sort().join('') : userAnswer
+
+            if (rightAnswerStr === userAnswerStr) ++sum
+          }
+
+          const result = Math.round(sum / answer.answers.length * 100)
+
           res.statusCode = 200
           res.setHeader('Content-Type', 'application/json')
-          // res.setHeader('Content-Type', 'text/plain')
-          res.json(answer)
+          res.json({ result })
         },
         error => next(error)
       )
