@@ -3,6 +3,10 @@ const Schema = mongoose.Schema
 const passportLocalMongoose = require('passport-local-mongoose')
 
 const User = new Schema({
+  refresh_token: {
+    type: String,
+    default: ''
+  },
   admin: {
     type: Boolean,
     default: false

@@ -129,6 +129,14 @@ router.route('/singin')
   .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
   .post(cors.corsWithOptions, authenticate.singin)
 
+router.route('/refresh-token')
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .post(cors.corsWithOptions, authenticate.refresh)
+
+router.route('/refresh-token/delete')
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .post(cors.corsWithOptions, authenticate.deleteRefresh)
+
 router.get('/facebook/token', passport.authenticate('facebook-token'), (req, res) => {
   if (req.user) {
     const token = authenticate.getToken({ _id: req.user._id })

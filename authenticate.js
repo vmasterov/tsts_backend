@@ -1,3 +1,4 @@
+const { randomBytes } = require('crypto')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const JwtStrategy = require('passport-jwt').Strategy
@@ -16,6 +17,7 @@ exports.singin = (req, res, next) => {
     if (err) {
       return next(err)
     }
+
     if (!user) {
       res.statusCode = 401
       res.setHeader('Content-Type', 'application/json')
@@ -26,16 +28,65 @@ exports.singin = (req, res, next) => {
         message: 'Неверный логин или пароль'
       })
     }
-    const token = jwt.sign({ _id: user._id }, config.secretKey, { expiresIn: 3600 })
+
     const message = req.singup ? 'Пользователь создан и вы успешно зарегистрированы в системе' : 'Вы успешно зарегистрированы в системе'
+    const token = jwt.sign({ _id: user._id }, config.secretKey, { expiresIn: 3600 })
+    const refreshToken = Date.now().toString() + '.' + randomBytes(40).toString('hex') // make unique
+
+    User.findOne({ _id: user._id })
+      .then(
+        user => {
+          user.refresh_token = refreshToken
+          user.save()
+        },
+        error => next(error)
+      )
+      .catch(
+        error => next(error)
+      )
+
     res.statusCode = 200
     res.setHeader('Content-Type', 'application/json')
     res.json({
       token,
+      refreshToken,
       success: true,
       message: message
     })
   })(req, res, next)
+}
+
+exports.refresh = (req, res, next) => {
+  User.findOne({ refresh_token: req.body.refreshToken })
+    .then(
+      user => {
+        res.statusCode = 201
+        res.setHeader('Content-Type', 'application/json')
+        res.json({
+          token: jwt.sign({ _id: user._id }, config.secretKey, { expiresIn: 3600 })
+        })
+      },
+      error => next(error)
+    )
+    .catch(
+      error => next(error)
+    )
+}
+
+exports.deleteRefresh = (req, res, next) => {
+  User.findOne({ refresh_token: req.body.refreshToken })
+    .then(
+      user => {
+        user.refresh_token = ''
+        user.save()
+        res.statusCode = 204
+        res.end()
+      },
+      error => next(error)
+    )
+    .catch(
+      error => next(error)
+    )
 }
 
 exports.getToken = user => jwt.sign(user, config.secretKey, { expiresIn: 3600 })
