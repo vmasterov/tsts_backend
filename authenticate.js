@@ -30,7 +30,7 @@ exports.singin = (req, res, next) => {
     }
 
     const message = req.singup ? 'Пользователь создан и вы успешно зарегистрированы в системе' : 'Вы успешно зарегистрированы в системе'
-    const token = jwt.sign({ _id: user._id }, config.secretKey, { expiresIn: 3600 })
+    const token = jwt.sign({ _id: user._id }, config.secretKey, { expiresIn: 5 })
     const refreshToken = Date.now().toString() + '.' + randomBytes(40).toString('hex') // make unique
 
     User.findOne({ _id: user._id })
@@ -60,11 +60,21 @@ exports.refresh = (req, res, next) => {
   User.findOne({ refresh_token: req.body.refreshToken })
     .then(
       user => {
-        res.statusCode = 201
-        res.setHeader('Content-Type', 'application/json')
-        res.json({
-          token: jwt.sign({ _id: user._id }, config.secretKey, { expiresIn: 3600 })
-        })
+        if (user) {
+          res.statusCode = 201
+          res.setHeader('Content-Type', 'application/json')
+          res.json({
+            token: jwt.sign({ _id: user._id }, config.secretKey, { expiresIn: 5 })
+          })
+        }
+        else {
+          res.statusCode = 401
+          res.setHeader('Content-Type', 'application/json')
+          res.json({
+            success: false,
+            message: 'Неверный refreshToken'
+          })
+        }
       },
       error => next(error)
     )
@@ -109,6 +119,7 @@ exports.verifyUser = (req, res, next) => {
     if (err) {
       return next(err)
     }
+
     if (!user) {
       res.statusCode = 401
       res.setHeader('Content-Type', 'application/json')
