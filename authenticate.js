@@ -27,6 +27,7 @@ exports.singin = (req, res, next) => {
         success: false,
         message: 'Неверный логин или пароль'
       })
+      return
     }
 
     const message = req.singup ? 'Пользователь создан и вы успешно зарегистрированы в системе' : 'Вы успешно зарегистрированы в системе'

@@ -57,13 +57,26 @@ router.route('/user/tests')
 
 router.route('/user/tests/:id')
   .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-  .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    Test.find({ _id: req.params.id })
+  .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+    Test.findOne({
+      _id: req.body.testId,
+      owner: req.body.ownerId
+    })
       .then(
         test => {
-          res.statusCode = 200
-          res.setHeader('Content-Type', 'application/json')
-          res.json(test)
+          if (test) {
+            res.statusCode = 200
+            res.setHeader('Content-Type', 'application/json')
+            res.json(test)
+          }
+          else {
+            res.statusCode = 404
+            res.setHeader('Content-Type', 'application/json')
+            res.json({
+              success: false,
+              message: 'Страница не найдена'
+            })
+          }
         },
         error => next(error)
       )
