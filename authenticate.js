@@ -31,7 +31,7 @@ exports.singin = (req, res, next) => {
     }
 
     const message = req.singup ? 'Пользователь создан и вы успешно зарегистрированы в системе' : 'Вы успешно зарегистрированы в системе'
-    const token = jwt.sign({ _id: user._id }, config.secretKey, { expiresIn: 5 })
+    const token = jwt.sign({ _id: user._id }, config.secretKey, { expiresIn: 3600 })
     const refreshToken = Date.now().toString() + '.' + randomBytes(40).toString('hex') // make unique
 
     User.findOne({ _id: user._id })
@@ -65,7 +65,7 @@ exports.refresh = (req, res, next) => {
           res.statusCode = 201
           res.setHeader('Content-Type', 'application/json')
           res.json({
-            token: jwt.sign({ _id: user._id }, config.secretKey, { expiresIn: 5 })
+            token: jwt.sign({ _id: user._id }, config.secretKey, { expiresIn: 3600 })
           })
         }
         else {
